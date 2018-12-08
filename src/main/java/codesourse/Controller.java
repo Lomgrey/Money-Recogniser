@@ -21,6 +21,8 @@ public class Controller {
     @FXML
     private ImageView recogniseImageView;
 
+    private Image imageForRecognising;
+
 
     public void initialize(){
 
@@ -36,8 +38,8 @@ public class Controller {
             Platform.runLater( () -> {
                 System.out.println(file.getAbsolutePath());
                 try {
-                    Image img = new Image(new FileInputStream(file.getAbsolutePath()));
-                    recogniseImageView.setImage(img);
+                    imageForRecognising = new Image(new FileInputStream(file.getAbsolutePath()));
+                    recogniseImageView.setImage(imageForRecognising);
 
                 } catch (FileNotFoundException ex) {
                     System.out.println(ex.getMessage());
