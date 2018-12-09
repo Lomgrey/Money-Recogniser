@@ -1,5 +1,6 @@
 package codesourse;
 
+import codesourse.recognition.ImageRecognition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
@@ -13,29 +14,37 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-
 public class Controller {
 
     @FXML
     private GridPane rootGridPane;
     @FXML
     private ImageView recogniseImageView;
+    @FXML
+    private ImageView outputImageView;
 
     private Image imageForRecognising;
 
+    //Исходное изображение денежки, исправь хардкод какнить
+    private String sourceFilename = "D:\\Money images\\sourceImage.jpg";
+    private String ContourFilename;
+    private String RotatedFilename;
+    private String CroppedFilename;
 
-    public void initialize(){
+    public void initialize() {
 
     }
 
     public void mouseDragDropped(final DragEvent e) {
+
         final Dragboard db = e.getDragboard();
         boolean success = false;
         if (db.hasFiles()) {
             success = true;
             // Only get the first file from the list
             final File file = db.getFiles().get(0);
-            Platform.runLater( () -> {
+            Platform.runLater(() -> {
+
                 System.out.println(file.getAbsolutePath());
                 try {
                     imageForRecognising = new Image(new FileInputStream(file.getAbsolutePath()));
@@ -46,6 +55,17 @@ public class Controller {
                 }
             });
         }
+
+        //вот я добавил это
+        ImageRecognition imageRecognition = new ImageRecognition(sourceFilename);
+        ContourFilename = imageRecognition.FindContour();
+        RotatedFilename = imageRecognition.RotateImage();
+        CroppedFilename = imageRecognition.CropImage();
+
+        File file = new File(CroppedFilename);
+        outputImageView.setImage(new Image((file.toURI().toString())));
+
+
         e.setDropCompleted(success);
         e.consume();
     }
@@ -70,7 +90,9 @@ public class Controller {
         }
     }
 
-    public void mouseDragExited(){
+    public void mouseDragExited() {
         rootGridPane.setStyle("-fx-border-color: #C6C6C6;");
     }
+
+
 }
