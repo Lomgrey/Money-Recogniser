@@ -3,4 +3,3 @@
 target/
 .gitignore
 /MoneyRecogniser.iml
-/pom.xml
