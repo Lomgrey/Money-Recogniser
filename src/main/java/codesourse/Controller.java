@@ -56,18 +56,19 @@ public class Controller {
             });
         }
 
-        //вот я добавил это
-        ImageRecognition imageRecognition = new ImageRecognition(sourceFilename);
-        ContourFilename = imageRecognition.FindContour();
-        RotatedFilename = imageRecognition.RotateImage();
-        CroppedFilename = imageRecognition.CropImage();
+        ImageRecognition imageRecognition = new ImageRecognition(initImagePath);
+        String contourFilename = imageRecognition.findContour();
+        String rotatedFilename = imageRecognition.rotateImage();
+        String croppedFilename = imageRecognition.cropImage();
 
-        File file = new File(CroppedFilename);
+        File file = new File(croppedFilename);
         outputImageView.setImage(new Image((file.toURI().toString())));
 
 
         e.setDropCompleted(success);
         e.consume();
+
+        showIntermediateImages();
     }
 
     public void mouseDragOver(final DragEvent e) {

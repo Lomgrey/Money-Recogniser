@@ -23,6 +23,8 @@ public class ImageRecognition {
     private int MAX_THRESHOLD = 50;
     private Random rng = new Random(12345);
 
+    private String saveFilePath = "/Users/sergeylomakin/Desktop/Money Recognise";
+
     public ImageRecognition(String filename) {
         //импорт изображения
         sourceMat = Imgcodecs.imread(filename);
@@ -32,13 +34,13 @@ public class ImageRecognition {
         }
     }
 
-    public String FindContour() {
+    public String findContour() {
         //серое изображение
         Mat srcGray = new Mat();
         Imgproc.cvtColor(sourceMat, srcGray, Imgproc.COLOR_BGR2GRAY);
         Imgproc.blur(srcGray, srcGray, new Size(3, 3));
 
-        //находим края по серому изображению, схораняем в лист!!! контуров
+        //находим края по серому изображению, схораняем в лист контуров
         Mat cannyOutput = new Mat();
         Imgproc.Canny(srcGray, cannyOutput, MAX_THRESHOLD, MAX_THRESHOLD * 2);
         List<MatOfPoint> contours = new ArrayList<>();
@@ -87,11 +89,12 @@ public class ImageRecognition {
         }
 
         //хардкод пути сохранения, исправь какнить
-        Imgcodecs.imwrite("D:\\Money images\\contourImage.jpg", contourMat);
-        return "D:\\Money images\\contourImage.jpg";
+        String contourImagePath = saveFilePath + "/contourImage.jpg";
+        Imgcodecs.imwrite(contourImagePath, contourMat);
+        return contourImagePath;
     }
 
-    public String RotateImage() {
+    public String rotateImage() {
         //повернули изображение короче
         rotatedMat = new Mat();
         Mat rotation = getRotationMatrix2D(rotatedRect.center, rotatedRect.angle, 1);
@@ -110,22 +113,25 @@ public class ImageRecognition {
         }
 
         //хардкод пути сохранения, исправь какнить
-        Imgcodecs.imwrite("D:\\Money images\\rotatedImage.jpg", rotatedMat);
-        return "D:\\Money images\\rotatedImage.jpg";
+        String rotatedImagePath = saveFilePath + "/rotatedImage.jpg";
+        Imgcodecs.imwrite(rotatedImagePath, rotatedMat);
+        return rotatedImagePath;
     }
 
 
-    public String CropImage() {
+    public String cropImage() {
         //обычный, не крученый прямоугольник
         Rect rect = normalizedRect.boundingRect();
         //Imgproc.rectangle(rotatedMat, rect.tl(), rect.br(), color, 2);
         croppedMat = rotatedMat.submat(rect);
-        Imgcodecs.imwrite("D:\\Money images\\croppedImage.jpg", croppedMat);
-        return "D:\\Money images\\croppedImage.jpg";
+
+        String croppedImagePath = saveFilePath + "/croppedImage.jpg";
+        Imgcodecs.imwrite(croppedImagePath, croppedMat);
+        return croppedImagePath;
     }
 
 
-    public Image MatToImage(Mat mat) {
+    public Image matToImage(Mat mat) {
         MatOfByte byteMat = new MatOfByte();
         Imgcodecs.imencode(".jpg", mat, byteMat);
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
