@@ -28,8 +28,12 @@ public class Controller {
     //Исходное изображение денежки, исправь хардкод какнить
     private String sourceFilename = "D:\\Money images\\sourceImage.jpg";
     private String ContourFilename;
-    private String RotatedFilename;
+    //private String RotatedFilename;
     private String CroppedFilename;
+    private String CroppedNominalFilename;
+    private String NominalEdgesFilename;
+    private String TemplateMatchingFFilename;
+
 
     public void initialize() {
 
@@ -59,10 +63,12 @@ public class Controller {
         //вот я добавил это
         ImageRecognition imageRecognition = new ImageRecognition(sourceFilename);
         ContourFilename = imageRecognition.FindContour();
-        RotatedFilename = imageRecognition.RotateImage();
+        //RotatedFilename = imageRecognition.RotateImage();
         CroppedFilename = imageRecognition.CropImage();
-
-        File file = new File(CroppedFilename);
+        CroppedNominalFilename = imageRecognition.CropNominal();
+        NominalEdgesFilename = imageRecognition.NominalEdges();
+        TemplateMatchingFFilename = imageRecognition.TemplateMatching();
+        File file = new File(TemplateMatchingFFilename);
         outputImageView.setImage(new Image((file.toURI().toString())));
 
 
