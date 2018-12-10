@@ -41,39 +41,10 @@ public class ImageRecognition {
     public String FindContour() {
         //находим края по серому изображению, схораняем в лист!!! контуров
         Mat cannyOutput = CannyEdges(sourceMat);
-//
-//        for (int i = (int)(cannyOutput.rows()*0.35); i < (int)(cannyOutput.rows()*0.45); i++) {
-//            for (int j = (int)(cannyOutput.cols()*0.25); j < (int)(cannyOutput.cols()*0.40); j++) {
-//                double[] data = cannyOutput.get(i, j); //Stores element in an array
-//                for (int k = 0; k < cannyOutput.channels(); k++) //Runs for the available number of channels
-//                {
-//                    data[k] = 0; //Pixel modification done here
-//                }
-//                cannyOutput.put(i, j, data); //Puts element back into matrix
-//            }
-//        }
-
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(cannyOutput, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-
-//        Rect rRect = new Rect();
-//        MatOfPoint2f contoursPoly = new MatOfPoint2f();
-//            Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(maxValIdx).toArray()), contoursPoly, 3, true);
-//            rRect = Imgproc.boundingRect(new MatOfPoint2f(contoursPoly.toArray()));
-//
-//
-//
-//        Rect = rRect;
-//        contourMat = sourceMat.clone();
-//
-//        //рисуется прямоугольник, охватывающий контур
-//        for (int i = 0; i < contours.size(); i++) {
-//            Scalar color = new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256));
-//            Imgproc.rectangle(contourMat, rRect.tl(), rRect.br(), color, 2);
-//        }
-
 
         Rect[] rRect = new Rect[contours.size()];
         MatOfPoint2f[] contoursPoly = new MatOfPoint2f[contours.size()];
@@ -82,7 +53,6 @@ public class ImageRecognition {
             Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
             rRect[i] = Imgproc.boundingRect(new MatOfPoint2f(contoursPoly[i].toArray()));
         }
-
 
         //из листа контуров ищем номер максимального по площади
         double maxVal = 0;
@@ -95,7 +65,6 @@ public class ImageRecognition {
             }
         }
 
-
         List<MatOfPoint> contoursPolyList = new ArrayList<>(contoursPoly.length);
         for (MatOfPoint2f poly : contoursPoly)
             contoursPolyList.add(new MatOfPoint(poly.toArray()));
@@ -104,50 +73,14 @@ public class ImageRecognition {
         contourMat = sourceMat.clone();
 
         //рисуется прямоугольник, охватывающий контур
-
         Scalar color = new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256));
         Imgproc.drawContours(contourMat, contoursPolyList, maxValIdx, color);
         Imgproc.rectangle(contourMat, Rect.tl(), Rect.br(), color, 2);
-
 
         //хардкод пути сохранения, исправь какнить
         Imgcodecs.imwrite("D:\\Money images\\contourImage.jpg", contourMat);
         return "D:\\Money images\\contourImage.jpg";
     }
-
-//    public String RotateImage() {
-//        //повернули изображение короче
-//        rotatedMat = new Mat();
-//        double angle = rotatedRect.angle;
-//        if (rotatedRect.size.height > rotatedRect.size.width)
-//            angle = 90 + angle;
-//        Mat rotation = getRotationMatrix2D(rotatedRect.center, angle, 1);
-//        warpAffine(sourceMat, rotatedMat, rotation, rotatedMat.size());
-//
-//        //повернули повернутый прямоугольник
-//        normalizedRect = rotatedRect;
-//        normalizedRect.angle -= angle;
-//        //нарисовали прямоугольник
-//        Point[] rectPoints = new Point[4];
-//        normalizedRect.points(rectPoints);
-//        if (rectPoints[0].y < rectPoints[3].y) {
-//            Point tmp = rectPoints[0];
-//            rectPoints[0] = rectPoints[3];
-//            rectPoints[1] = rectPoints[2];
-//            rectPoints[2] = rectPoints[3];
-//            rectPoints[3] = tmp;
-//        }
-//
-//        Scalar color = new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256));
-//        for (int j = 0; j < 4; j++) {
-//            Imgproc.line(rotatedMat, rectPoints[j], rectPoints[(j + 1) % 4], color);
-//        }
-//
-//        //хардкод пути сохранения, исправь какнить
-//        Imgcodecs.imwrite("D:\\Money images\\rotatedImage.jpg", rotatedMat);
-//        return "D:\\Money images\\rotatedImage.jpg";
-//    }
-
 
     public String CropImage() {
         //обычный, не крученый прямоугольник
@@ -217,6 +150,4 @@ public class ImageRecognition {
         Imgcodecs.imencode(".jpg", mat, byteMat);
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
     }
-
-
 }

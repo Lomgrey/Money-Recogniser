@@ -28,7 +28,6 @@ public class Controller {
     //Исходное изображение денежки, исправь хардкод какнить
     private String sourceFilename = "D:\\Money images\\sourceImage.jpg";
     private String ContourFilename;
-    //private String RotatedFilename;
     private String CroppedFilename;
     private String CroppedNominalFilename;
     private String NominalEdgesFilename;
@@ -63,7 +62,6 @@ public class Controller {
         //вот я добавил это
         ImageRecognition imageRecognition = new ImageRecognition(sourceFilename);
         ContourFilename = imageRecognition.FindContour();
-        //RotatedFilename = imageRecognition.RotateImage();
         CroppedFilename = imageRecognition.CropImage();
         CroppedNominalFilename = imageRecognition.CropNominal();
         NominalEdgesFilename = imageRecognition.NominalEdges();
