@@ -16,7 +16,7 @@ public class IntermediateViewController {
 
 
     public void initialize() {
-
+        // init
     }
 
     public void addImages(List<Image> images){
