@@ -3,16 +3,23 @@ package codesourse;
 import codesourse.recognition.ImageRecognition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Controller {
 
@@ -26,27 +33,30 @@ public class Controller {
     private Image imageForRecognising;
 
     //Исходное изображение денежки, исправь хардкод какнить
-    private String sourceFilename = "D:\\Money images\\sourceImage.jpg";
-    private String ContourFilename;
-    private String RotatedFilename;
-    private String CroppedFilename;
+    // private String sourceFiles = "D:\\Money images\\sourceImage.jpg";
+//    private String ContourFilename;
+//    private String RotatedFilename;
+//    private String CroppedFilename;
 
-    public void initialize() {
+    private final String sourceFiles = "/Users/sergeylomakin/Desktop/Money Recognise";
+    private final String initImagePath = sourceFiles.toString() + "/sourceImage.jpg";
 
-    }
 
     public void mouseDragDropped(final DragEvent e) {
 
         final Dragboard db = e.getDragboard();
+
         boolean success = false;
         if (db.hasFiles()) {
             success = true;
-            // Only get the first file from the list
+            // получаем только первое изображение
             final File file = db.getFiles().get(0);
             Platform.runLater(() -> {
 
                 System.out.println(file.getAbsolutePath());
                 try {
+                    // todo - почему то не добавляет, потом исправить
+//                    sourceFiles.append(file.getAbsolutePath());
                     imageForRecognising = new Image(new FileInputStream(file.getAbsolutePath()));
                     recogniseImageView.setImage(imageForRecognising);
 
@@ -95,5 +105,48 @@ public class Controller {
         rootGridPane.setStyle("-fx-border-color: #C6C6C6;");
     }
 
+    private void showIntermediateImages() {
+        IntermediateViewController controller;
+        try {
+             controller = loadViewFromResource("intermediateView.fxml");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
+        // todo брать пути из того, что возвращает ImageRecognition
+        List<Image> images = getImageList();
+
+        controller.addImages(images);
+    }
+
+    private IntermediateViewController loadViewFromResource(String pathForResource) throws IOException {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource(pathForResource));
+            Parent root = fxmlLoader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Intermediate Images");
+            stage.setScene(new Scene(root, 600, 400));
+            stage.show();
+
+            return fxmlLoader.getController();
+        } catch (IOException e){
+            System.out.println(e.getMessage());
+            throw e;
+        }
+    }
+
+    private List<Image> getImageList(){
+        List<Image> images = new LinkedList<>();
+        try {
+            images.add(new Image(new FileInputStream(sourceFiles + "/contourImage.jpg")));
+            images.add(new Image(new FileInputStream(sourceFiles + "/rotatedImage.jpg")));
+            images.add(new Image(new FileInputStream(sourceFiles + "/croppedImage.jpg")));
+        } catch (FileNotFoundException e){
+            System.out.println(e.getMessage());
+        }
+
+        return images;
+    }
 }
