@@ -93,7 +93,7 @@ public class ImageRecognition {
         Imgproc.rectangle(contourMat, Rect.tl(), Rect.br(), color, 2);
 
         //хардкод пути сохранения, исправь какнить
-        Imgcodecs.imwrite("D:\\Money images\\contourImage.jpg", cannyOutput);
+        Imgcodecs.imwrite("D:\\Money images\\contourImage.jpg", contourMat);
         return "D:\\Money images\\contourImage.jpg";
     }
 
