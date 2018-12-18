@@ -42,7 +42,7 @@ public class Controller {
     private String TemplateMatchingFFilename;
     private String Nominal;
 
-    private final String sourceFiles = "/Users/sergeylomakin/Desktop/Money Recognise";
+    private final String sourceFiles = "D:\\Money images";
     private final String initImagePath = sourceFiles.toString() + "/sourceImage.jpg";
 
     public void initialize() {
@@ -150,8 +150,8 @@ public class Controller {
         List<Image> images = new LinkedList<>();
         try {
             images.add(new Image(new FileInputStream(sourceFiles + "/contourImage.jpg")));
-            images.add(new Image(new FileInputStream(sourceFiles + "/rotatedImage.jpg")));
             images.add(new Image(new FileInputStream(sourceFiles + "/croppedImage.jpg")));
+            images.add(new Image(new FileInputStream(sourceFiles + "/normalizedImage.jpg")));
         } catch (FileNotFoundException e){
             System.out.println(e.getMessage());
         }
