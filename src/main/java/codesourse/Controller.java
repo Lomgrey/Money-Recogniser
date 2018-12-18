@@ -86,6 +86,8 @@ public class Controller {
 
         e.setDropCompleted(success);
         e.consume();
+
+        showIntermediateImages();
     }
 
     public void mouseDragOver(final DragEvent e) {
