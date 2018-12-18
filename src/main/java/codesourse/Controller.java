@@ -29,9 +29,11 @@ public class Controller {
     private String sourceFilename = "D:\\Money images\\sourceImage.jpg";
     private String ContourFilename;
     private String CroppedFilename;
+    private String NormalizedFileName;
     private String CroppedNominalFilename;
     private String NominalEdgesFilename;
     private String TemplateMatchingFFilename;
+    private String Nominal;
 
 
     public void initialize() {
@@ -63,9 +65,12 @@ public class Controller {
         ImageRecognition imageRecognition = new ImageRecognition(sourceFilename);
         ContourFilename = imageRecognition.FindContour();
         CroppedFilename = imageRecognition.CropImage();
+        NormalizedFileName = imageRecognition.NormalizeImage();
         CroppedNominalFilename = imageRecognition.CropNominal();
         NominalEdgesFilename = imageRecognition.NominalEdges();
-        TemplateMatchingFFilename = imageRecognition.TemplateMatching();
+        TemplateMatchingFFilename = imageRecognition.TemplateMatching();//вернет пустоту, если не распознан
+        Nominal = imageRecognition.Nominal();// тут типа номинал
+
         File file = new File(TemplateMatchingFFilename);
         outputImageView.setImage(new Image((file.toURI().toString())));
 
