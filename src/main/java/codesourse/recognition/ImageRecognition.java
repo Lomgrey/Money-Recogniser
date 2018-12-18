@@ -66,7 +66,7 @@ public class ImageRecognition {
         for (int i = 0; i < contours.size(); i++) {
             contoursPoly[i] = new MatOfPoint2f();
             Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
-            rRect[i] = Imgproc.boundingRect(new MatOfPoint2f(contoursPoly[i].toArray()));
+            rRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
         }
 
         //из листа контуров ищем номер максимального по площади
