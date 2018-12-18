@@ -33,30 +33,34 @@ public class Controller {
     private Image imageForRecognising;
 
     //Исходное изображение денежки, исправь хардкод какнить
-    // private String sourceFiles = "D:\\Money images\\sourceImage.jpg";
-//    private String ContourFilename;
-//    private String RotatedFilename;
-//    private String CroppedFilename;
+    private String sourceFilename = "D:\\Money images\\sourceImage.jpg";
+    private String ContourFilename;
+    private String CroppedFilename;
+    private String NormalizedFileName;
+    private String CroppedNominalFilename;
+    private String NominalEdgesFilename;
+    private String TemplateMatchingFFilename;
+    private String Nominal;
 
     private final String sourceFiles = "/Users/sergeylomakin/Desktop/Money Recognise";
     private final String initImagePath = sourceFiles.toString() + "/sourceImage.jpg";
 
+    public void initialize() {
+
+    }
 
     public void mouseDragDropped(final DragEvent e) {
 
         final Dragboard db = e.getDragboard();
-
         boolean success = false;
         if (db.hasFiles()) {
             success = true;
-            // получаем только первое изображение
+            // Only get the first file from the list
             final File file = db.getFiles().get(0);
             Platform.runLater(() -> {
 
                 System.out.println(file.getAbsolutePath());
                 try {
-                    // todo - почему то не добавляет, потом исправить
-//                    sourceFiles.append(file.getAbsolutePath());
                     imageForRecognising = new Image(new FileInputStream(file.getAbsolutePath()));
                     recogniseImageView.setImage(imageForRecognising);
 
@@ -66,12 +70,17 @@ public class Controller {
             });
         }
 
-        ImageRecognition imageRecognition = new ImageRecognition(initImagePath);
-        String contourFilename = imageRecognition.findContour();
-        String rotatedFilename = imageRecognition.rotateImage();
-        String croppedFilename = imageRecognition.cropImage();
+        //вот я добавил это
+        ImageRecognition imageRecognition = new ImageRecognition(sourceFilename);
+        ContourFilename = imageRecognition.FindContour();
+        CroppedFilename = imageRecognition.CropImage();
+        NormalizedFileName = imageRecognition.NormalizeImage();
+        CroppedNominalFilename = imageRecognition.CropNominal();
+        NominalEdgesFilename = imageRecognition.NominalEdges();
+        TemplateMatchingFFilename = imageRecognition.TemplateMatching();//вернет пустоту, если не распознан
+        Nominal = imageRecognition.Nominal();// тут типа номинал
 
-        File file = new File(croppedFilename);
+        File file = new File(TemplateMatchingFFilename);
         outputImageView.setImage(new Image((file.toURI().toString())));
 
 
