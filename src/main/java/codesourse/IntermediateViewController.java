@@ -27,8 +27,8 @@ public class IntermediateViewController {
     public void addImage(Image image){
         ImageView imageView = new ImageView();
         imageView.setImage(image);
-        imageView.setFitWidth(595);
-        imageView.setFitHeight(370);
+        imageView.setFitWidth(715);
+        imageView.setFitHeight(560);
         imageView.setPreserveRatio(true);
 
         int tabIndex = imagesTabPane.getTabs().size();

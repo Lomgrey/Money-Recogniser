@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -29,7 +30,7 @@ public class Controller {
     @FXML
     private ImageView recogniseImageView;
     @FXML
-    private ImageView outputImageView;
+    private Label infoLabel;
 
     private Image imageForRecognising;
 
@@ -48,6 +49,7 @@ public class Controller {
         final Dragboard db = e.getDragboard();
         boolean success = false;
         if (db.hasFiles()) {
+            infoLabel.setVisible(false);
             success = true;
             // получаем только первое изображение
             sourceFile = db.getFiles().get(0);
@@ -99,7 +101,7 @@ public class Controller {
         String templateMatchingFilename = imageRecognition.TemplateMatching();//вернет пустоту, если не распознан
         String nominal = imageRecognition.Nominal();// тут типа номинал
 
-        showIntermediateImages();
+//        showIntermediateImages();
 
         if (templateMatchingFilename.equals("")) {
             System.out.println("Купюра не распознана");
@@ -111,7 +113,7 @@ public class Controller {
         }
     }
 
-    private void showIntermediateImages() {
+    public void showIntermediateImages() {
         IntermediateViewController controller;
         try {
              controller = loadViewFromResource("intermediateView.fxml");
@@ -133,7 +135,7 @@ public class Controller {
 
             Stage stage = new Stage();
             stage.setTitle("Intermediate Images");
-            stage.setScene(new Scene(root, 600, 400));
+            stage.setScene(new Scene(root, 723, 586));
             stage.show();
 
             return fxmlLoader.getController();
@@ -146,12 +148,14 @@ public class Controller {
     private List<Image> getImageList(){
         List<Image> images = new LinkedList<>();
         String sourcePath = sourceFile.getParent();
-        try {
-            images.add(new Image(new FileInputStream(sourcePath + "/contourImage.jpg")));
-            images.add(new Image(new FileInputStream(sourcePath + "/croppedImage.jpg")));
-            images.add(new Image(new FileInputStream(sourcePath + "/normalizedImage.jpg")));
-        } catch (FileNotFoundException e){
-            System.out.println(e.getMessage());
+
+
+        for (ImageRecognition.IntermediateFiles fileName : ImageRecognition.IntermediateFiles.values()) {
+            try {
+                images.add(new Image(new FileInputStream(sourcePath + fileName)));
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
         }
 
         return images;
@@ -163,6 +167,6 @@ public class Controller {
         alert.setHeaderText(null);
         alert.setContentText(message);
 
-        alert.showAndWait();
+        alert.show();
     }
 }

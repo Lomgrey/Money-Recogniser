@@ -101,7 +101,7 @@ public class ImageRecognition {
         Imgproc.rectangle(contourMat, Rect.tl(), Rect.br(), color, 2);
 
         //хардкод пути сохранения, исправь какнить
-        String imgFile = tempImagesFolderPath + "/contourImage.jpg";
+        String imgFile = tempImagesFolderPath + IntermediateFiles.CONTOUR;
         Imgcodecs.imwrite(imgFile, contourMat);
         return imgFile;
     }
@@ -110,7 +110,7 @@ public class ImageRecognition {
         //обычный, не крученый прямоугольник
         croppedMat = contourMat.submat(Rect);
 
-        String imgFile = tempImagesFolderPath + "/croppedImage.jpg";
+        String imgFile = tempImagesFolderPath + IntermediateFiles.CROPPED;
         Imgcodecs.imwrite(imgFile, croppedMat);
 
         return imgFile;
@@ -154,7 +154,7 @@ public class ImageRecognition {
         NormalizedMat = new Mat();
         warpPerspective(croppedMat, NormalizedMat, PerspectiveTransformMat, new Size(900, 390));
 
-        String imgFile = tempImagesFolderPath + "/normalizedImage.jpg";
+        String imgFile = tempImagesFolderPath + IntermediateFiles.NOMALIZED;
         Imgcodecs.imwrite(imgFile, NormalizedMat);
 
         return imgFile;
@@ -164,7 +164,7 @@ public class ImageRecognition {
         Rect crop = new Rect(685, 240, 180, 120);
         croppedNominalMat = NormalizedMat.submat(crop);
 
-        String imgFile = tempImagesFolderPath + "/croppedNominalImage.jpg";
+        String imgFile = tempImagesFolderPath + IntermediateFiles.CROPED_NORMAL;
         Imgcodecs.imwrite(imgFile, croppedNominalMat);
 
         return imgFile;
@@ -173,7 +173,7 @@ public class ImageRecognition {
     public String NominalEdges() {
         nominalEdgesMat = CannyEdges(croppedNominalMat);
 
-        String imgFile = tempImagesFolderPath + "/nominalEdgesImage.jpg";
+        String imgFile = tempImagesFolderPath + IntermediateFiles.NOMINAL_EDGES;
         Imgcodecs.imwrite(imgFile, nominalEdgesMat);
 
         return imgFile;
@@ -246,5 +246,23 @@ public class ImageRecognition {
         MatOfByte byteMat = new MatOfByte();
         Imgcodecs.imencode(".jpg", mat, byteMat);
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
+    }
+
+    public enum IntermediateFiles {
+        CONTOUR("/contourImage.jpg"),
+        CROPPED("/croppedImage.jpg"),
+        NOMALIZED("/normalizedImage.jpg"),
+        CROPED_NORMAL("/croppedNominalImage.jpg"),
+        NOMINAL_EDGES("/nominalEdgesImage.jpg");
+
+        private String fileName;
+        IntermediateFiles(String fileName) {
+            this.fileName = fileName;
+        }
+
+        @Override
+        public String toString() {
+            return fileName;
+        }
     }
 }
