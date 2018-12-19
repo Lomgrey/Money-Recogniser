@@ -10,7 +10,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 import static org.opencv.imgproc.Imgproc.*;
 
@@ -154,7 +153,7 @@ public class ImageRecognition {
         NormalizedMat = new Mat();
         warpPerspective(croppedMat, NormalizedMat, PerspectiveTransformMat, new Size(900, 390));
 
-        String imgFile = tempImagesFolderPath + IntermediateFiles.NOMALIZED;
+        String imgFile = tempImagesFolderPath + IntermediateFiles.NORMALIZED;
         Imgcodecs.imwrite(imgFile, NormalizedMat);
 
         return imgFile;
@@ -164,7 +163,7 @@ public class ImageRecognition {
         Rect crop = new Rect(685, 240, 180, 120);
         croppedNominalMat = NormalizedMat.submat(crop);
 
-        String imgFile = tempImagesFolderPath + IntermediateFiles.CROPED_NORMAL;
+        String imgFile = tempImagesFolderPath + IntermediateFiles.CROPPED_NORMAL;
         Imgcodecs.imwrite(imgFile, croppedNominalMat);
 
         return imgFile;
@@ -209,7 +208,7 @@ public class ImageRecognition {
         Imgproc.rectangle(img, matchLoc[index], new Point(matchLoc[index].x + templateMat[index].cols(), matchLoc[index].y + templateMat[index].rows()),
                 new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256)));
 
-        String imgFile = tempImagesFolderPath + "/templateImage.jpg";
+        String imgFile = tempImagesFolderPath + IntermediateFiles.TEMPLATE;
         Imgcodecs.imwrite(imgFile, img);
 
         return imgFile;
@@ -251,9 +250,10 @@ public class ImageRecognition {
     public enum IntermediateFiles {
         CONTOUR("/contourImage.jpg"),
         CROPPED("/croppedImage.jpg"),
-        NOMALIZED("/normalizedImage.jpg"),
-        CROPED_NORMAL("/croppedNominalImage.jpg"),
-        NOMINAL_EDGES("/nominalEdgesImage.jpg");
+        NORMALIZED("/normalizedImage.jpg"),
+        CROPPED_NORMAL("/croppedNominalImage.jpg"),
+        NOMINAL_EDGES("/nominalEdgesImage.jpg"),
+        TEMPLATE("/templateImage.jpg");
 
         private String fileName;
         IntermediateFiles(String fileName) {
