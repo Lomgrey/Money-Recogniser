@@ -6,9 +6,11 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import static org.opencv.imgproc.Imgproc.*;
 
@@ -25,12 +27,16 @@ public class ImageRecognition {
     private Mat[] templateMat = new Mat[3];
     private int index;
 
-    private int MAX_THRESHOLD = 45;
+    private int MAX_THRESHOLD = 40;
     private Random rng = new Random(12345);
 
-    public ImageRecognition(String filename) {
+    private final String tempImagesFolderPath;
+
+    public ImageRecognition(File filename) {
+        tempImagesFolderPath = filename.getParent();
+
         //импорт изображения
-        sourceMat = Imgcodecs.imread(filename);
+        sourceMat = Imgcodecs.imread(filename.getAbsolutePath());
         if (sourceMat.empty()) {
             System.err.println("Cannot read image: " + filename);
             System.exit(0);
@@ -44,11 +50,13 @@ public class ImageRecognition {
             resize(sourceMat, sourceMat, size);
         }
 
-        templateMat[0] = Imgcodecs.imread("D:\\Money images\\Template50.jpg");
+        templateMat[0] = Imgcodecs.imread(tempImagesFolderPath + "/Template50.jpg");
         Imgproc.cvtColor(templateMat[0], templateMat[0], Imgproc.COLOR_BGR2GRAY);
-        templateMat[1] = Imgcodecs.imread("D:\\Money images\\Template100.jpg");
+
+        templateMat[1] = Imgcodecs.imread(tempImagesFolderPath + "/Template100.jpg");
         Imgproc.cvtColor(templateMat[1], templateMat[1], Imgproc.COLOR_BGR2GRAY);
-//        template500Mat = Imgcodecs.imread("D:\\Money images\\Template500.jpg");
+
+//        template500Mat = Imgcodecs.imread(tempImagesFolderPath + "Template500.jpg");
 //        Imgproc.cvtColor(template500Mat, template500Mat, Imgproc.COLOR_BGR2GRAY);
     }
 
@@ -93,15 +101,19 @@ public class ImageRecognition {
         Imgproc.rectangle(contourMat, Rect.tl(), Rect.br(), color, 2);
 
         //хардкод пути сохранения, исправь какнить
-        Imgcodecs.imwrite("D:\\Money images\\contourImage.jpg", contourMat);
-        return "D:\\Money images\\contourImage.jpg";
+        String imgFile = tempImagesFolderPath + "/contourImage.jpg";
+        Imgcodecs.imwrite(imgFile, contourMat);
+        return imgFile;
     }
 
     public String CropImage() {
         //обычный, не крученый прямоугольник
         croppedMat = contourMat.submat(Rect);
-        Imgcodecs.imwrite("D:\\Money images\\croppedImage.jpg", croppedMat);
-        return "D:\\Money images\\croppedImage.jpg";
+
+        String imgFile = tempImagesFolderPath + "/croppedImage.jpg";
+        Imgcodecs.imwrite(imgFile, croppedMat);
+
+        return imgFile;
     }
 
     public String NormalizeImage() {
@@ -141,21 +153,30 @@ public class ImageRecognition {
         Mat PerspectiveTransformMat = getPerspectiveTransform(src, dst);
         NormalizedMat = new Mat();
         warpPerspective(croppedMat, NormalizedMat, PerspectiveTransformMat, new Size(900, 390));
-        Imgcodecs.imwrite("D:\\Money images\\normalizedImage.jpg", NormalizedMat);
-        return "D:\\Money images\\normalizedImage.jpg";
+
+        String imgFile = tempImagesFolderPath + "/normalizedImage.jpg";
+        Imgcodecs.imwrite(imgFile, NormalizedMat);
+
+        return imgFile;
     }
 
     public String CropNominal() {
         Rect crop = new Rect(685, 240, 180, 120);
         croppedNominalMat = NormalizedMat.submat(crop);
-        Imgcodecs.imwrite("D:\\Money images\\croppedNominalImage.jpg", croppedNominalMat);
-        return "D:\\Money images\\croppedNominalImage.jpg";
+
+        String imgFile = tempImagesFolderPath + "/croppedNominalImage.jpg";
+        Imgcodecs.imwrite(imgFile, croppedNominalMat);
+
+        return imgFile;
     }
 
     public String NominalEdges() {
         nominalEdgesMat = CannyEdges(croppedNominalMat);
-        Imgcodecs.imwrite("D:\\Money images\\NominalEdgesImage.jpg", nominalEdgesMat);
-        return "D:\\Money images\\NominalEdgesImage.jpg";
+
+        String imgFile = tempImagesFolderPath + "/nominalEdgesImage.jpg";
+        Imgcodecs.imwrite(imgFile, nominalEdgesMat);
+
+        return imgFile;
     }
 
     public String TemplateMatching() {
@@ -187,8 +208,11 @@ public class ImageRecognition {
 
         Imgproc.rectangle(img, matchLoc[index], new Point(matchLoc[index].x + templateMat[index].cols(), matchLoc[index].y + templateMat[index].rows()),
                 new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256)));
-        Imgcodecs.imwrite("D:\\Money images\\templateImage.jpg", img);
-        return "D:\\Money images\\templateImage.jpg";
+
+        String imgFile = tempImagesFolderPath + "/templateImage.jpg";
+        Imgcodecs.imwrite(imgFile, img);
+
+        return imgFile;
     }
 
     public String Nominal() {

@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -33,17 +34,10 @@ public class Controller {
     private Image imageForRecognising;
 
     //Исходное изображение денежки, исправь хардкод какнить
-    private String sourceFilename = "D:\\Money images\\sourceImage.jpg";
-    private String ContourFilename;
-    private String CroppedFilename;
-    private String NormalizedFileName;
-    private String CroppedNominalFilename;
-    private String NominalEdgesFilename;
-    private String TemplateMatchingFFilename;
-    private String Nominal;
+    private File sourceFile;
 
-    private final String sourceFiles = "D:\\Money images";
-    private final String initImagePath = sourceFiles.toString() + "/sourceImage.jpg";
+//    private String sourceFiles = "D:\\Money images";
+//    private final String initImagePath = sourceFiles.toString() + "/sourceImage.jpg";
 
     public void initialize() {
 
@@ -56,12 +50,10 @@ public class Controller {
         if (db.hasFiles()) {
             success = true;
             // получаем только первое изображение
-            final File file = db.getFiles().get(0);
+            sourceFile = db.getFiles().get(0);
             Platform.runLater(() -> {
-
-                System.out.println(file.getAbsolutePath());
                 try {
-                    imageForRecognising = new Image(new FileInputStream(file.getAbsolutePath()));
+                    imageForRecognising = new Image(new FileInputStream(sourceFile.getAbsolutePath()));
                     recogniseImageView.setImage(imageForRecognising);
 
                 } catch (FileNotFoundException ex) {
@@ -70,24 +62,8 @@ public class Controller {
             });
         }
 
-        //вот я добавил это
-        ImageRecognition imageRecognition = new ImageRecognition(sourceFilename);
-        ContourFilename = imageRecognition.FindContour();
-        CroppedFilename = imageRecognition.CropImage();
-        NormalizedFileName = imageRecognition.NormalizeImage();
-        CroppedNominalFilename = imageRecognition.CropNominal();
-        NominalEdgesFilename = imageRecognition.NominalEdges();
-        TemplateMatchingFFilename = imageRecognition.TemplateMatching();//вернет пустоту, если не распознан
-        Nominal = imageRecognition.Nominal();// тут типа номинал
-
-        File file = new File(TemplateMatchingFFilename);
-        outputImageView.setImage(new Image((file.toURI().toString())));
-
-
         e.setDropCompleted(success);
         e.consume();
-
-        showIntermediateImages();
     }
 
     public void mouseDragOver(final DragEvent e) {
@@ -112,6 +88,27 @@ public class Controller {
 
     public void mouseDragExited() {
         rootGridPane.setStyle("-fx-border-color: #C6C6C6;");
+
+        //вот я добавил это
+        ImageRecognition imageRecognition = new ImageRecognition(sourceFile);
+        String contourFilename = imageRecognition.FindContour();
+        String croppedFilename = imageRecognition.CropImage();
+        String normalizedFileName = imageRecognition.NormalizeImage();
+        String croppedNominalFilename = imageRecognition.CropNominal();
+        String nominalEdgesFilename = imageRecognition.NominalEdges();
+        String templateMatchingFilename = imageRecognition.TemplateMatching();//вернет пустоту, если не распознан
+        String nominal = imageRecognition.Nominal();// тут типа номинал
+
+        showIntermediateImages();
+
+        if (templateMatchingFilename.equals("")) {
+            System.out.println("Купюра не распознана");
+            showAlert(Alert.AlertType.INFORMATION, "Купюра не распознана");
+        }
+        else {
+            System.out.println("Ваша купюра номиналом " + nominal + " рублей");
+            showAlert(Alert.AlertType.INFORMATION, "Ваша купюра номиналом " + nominal + " рублей");
+        }
     }
 
     private void showIntermediateImages() {
@@ -148,14 +145,24 @@ public class Controller {
 
     private List<Image> getImageList(){
         List<Image> images = new LinkedList<>();
+        String sourcePath = sourceFile.getParent();
         try {
-            images.add(new Image(new FileInputStream(sourceFiles + "/contourImage.jpg")));
-            images.add(new Image(new FileInputStream(sourceFiles + "/croppedImage.jpg")));
-            images.add(new Image(new FileInputStream(sourceFiles + "/normalizedImage.jpg")));
+            images.add(new Image(new FileInputStream(sourcePath + "/contourImage.jpg")));
+            images.add(new Image(new FileInputStream(sourcePath + "/croppedImage.jpg")));
+            images.add(new Image(new FileInputStream(sourcePath + "/normalizedImage.jpg")));
         } catch (FileNotFoundException e){
             System.out.println(e.getMessage());
         }
 
         return images;
+    }
+
+    private void showAlert(Alert.AlertType alertType, String message){
+        Alert alert = new Alert(alertType);
+        alert.setTitle("Message");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
     }
 }
