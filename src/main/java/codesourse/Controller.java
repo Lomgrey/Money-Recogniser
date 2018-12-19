@@ -106,8 +106,7 @@ public class Controller {
         if (templateMatchingFilename.equals("")) {
             System.out.println("Купюра не распознана");
             showAlert(Alert.AlertType.INFORMATION, "Купюра не распознана");
-        }
-        else {
+        } else {
             System.out.println("Ваша купюра номиналом " + nominal + " рублей");
             showAlert(Alert.AlertType.INFORMATION, "Ваша купюра номиналом " + nominal);
         }
@@ -116,7 +115,7 @@ public class Controller {
     public void showIntermediateImages() {
         IntermediateViewController controller;
         try {
-             controller = loadViewFromResource("intermediateView.fxml");
+            controller = loadViewFromResource("intermediateView.fxml");
         } catch (IOException e) {
             System.out.println(e.getMessage());
             return;
@@ -139,13 +138,13 @@ public class Controller {
             stage.show();
 
             return fxmlLoader.getController();
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
             throw e;
         }
     }
 
-    private List<Image> getImageList(){
+    private List<Image> getImageList() {
         List<Image> images = new LinkedList<>();
         String sourcePath = sourceFile.getParent();
 
@@ -161,7 +160,7 @@ public class Controller {
         return images;
     }
 
-    private void showAlert(Alert.AlertType alertType, String message){
+    private void showAlert(Alert.AlertType alertType, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle("Message");
         alert.setHeaderText(null);
