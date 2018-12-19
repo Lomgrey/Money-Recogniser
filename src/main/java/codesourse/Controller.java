@@ -107,7 +107,7 @@ public class Controller {
         }
         else {
             System.out.println("Ваша купюра номиналом " + nominal + " рублей");
-            showAlert(Alert.AlertType.INFORMATION, "Ваша купюра номиналом " + nominal + " рублей");
+            showAlert(Alert.AlertType.INFORMATION, "Ваша купюра номиналом " + nominal);
         }
     }
 
