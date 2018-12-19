@@ -23,10 +23,11 @@ public class ImageRecognition {
     private Mat NormalizedMat;
     private Mat croppedNominalMat;
     private Mat nominalEdgesMat;
-    private Mat[] templateMat = new Mat[3];
-    private int index;
+    //   private Mat[] templateMat = new Mat[3];
+    private ArrayList<Mat[]> templatesMat = new ArrayList<>(3);
+    private int index1, index2;
 
-    private int MAX_THRESHOLD = 40;
+    private int MAX_THRESHOLD = 35;
     private Random rng = new Random(12345);
 
     private final String tempImagesFolderPath;
@@ -49,14 +50,35 @@ public class ImageRecognition {
             resize(sourceMat, sourceMat, size);
         }
 
-        templateMat[0] = Imgcodecs.imread(tempImagesFolderPath + "/Template50.jpg");
-        Imgproc.cvtColor(templateMat[0], templateMat[0], Imgproc.COLOR_BGR2GRAY);
+//        templateMat[0] = Imgcodecs.imread(tempImagesFolderPath + "/Template50.jpg");
+//        Imgproc.cvtColor(templateMat[0], templateMat[0], Imgproc.COLOR_BGR2GRAY);
+//
+//        templateMat[1] = Imgcodecs.imread(tempImagesFolderPath + "/Template100.jpg");
+//        Imgproc.cvtColor(templateMat[1], templateMat[1], Imgproc.COLOR_BGR2GRAY);
+//
+//        templateMat[2] = Imgcodecs.imread(tempImagesFolderPath + "/Template200.jpg");
+//        Imgproc.cvtColor(templateMat[2], templateMat[2], Imgproc.COLOR_BGR2GRAY);
 
-        templateMat[1] = Imgcodecs.imread(tempImagesFolderPath + "/Template100.jpg");
-        Imgproc.cvtColor(templateMat[1], templateMat[1], Imgproc.COLOR_BGR2GRAY);
 
-//        template500Mat = Imgcodecs.imread(tempImagesFolderPath + "Template500.jpg");
-//        Imgproc.cvtColor(template500Mat, template500Mat, Imgproc.COLOR_BGR2GRAY);
+        templatesMat.add(new Mat[5]);//было бы круто считать количество темплейтов в папке
+        templatesMat.add(new Mat[5]);
+        templatesMat.add(new Mat[6]);
+
+        for (int i = 0; i < templatesMat.get(0).length; i++) {
+            templatesMat.get(0)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates50/Template50_" + (i + 1) + ".jpg");
+            Imgproc.cvtColor(templatesMat.get(0)[i], templatesMat.get(0)[i], Imgproc.COLOR_BGR2GRAY);
+        }
+
+        for (int i = 0; i < templatesMat.get(1).length; i++) {
+            templatesMat.get(1)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates100/Template100_" + (i + 1) + ".jpg");
+            Imgproc.cvtColor(templatesMat.get(1)[i], templatesMat.get(1)[i], Imgproc.COLOR_BGR2GRAY);
+        }
+
+        for (int i = 0; i < templatesMat.get(2).length; i++) {
+            templatesMat.get(2)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates200/Template200_" + (i + 1) + ".jpg");
+            Imgproc.cvtColor(templatesMat.get(2)[i], templatesMat.get(2)[i], Imgproc.COLOR_BGR2GRAY);
+        }
+
     }
 
     public String FindContour() {
@@ -160,7 +182,7 @@ public class ImageRecognition {
     }
 
     public String CropNominal() {
-        Rect crop = new Rect(685, 240, 180, 120);
+        Rect crop = new Rect(665, 210, 200, 150);
         croppedNominalMat = NormalizedMat.submat(crop);
 
         String imgFile = tempImagesFolderPath + IntermediateFiles.CROPPED_NORMAL;
@@ -178,48 +200,102 @@ public class ImageRecognition {
         return imgFile;
     }
 
+//    public String TemplateMatching() {
+//        Mat[] resultMat = new Mat[3];
+//        Point[] matchLoc = new Point[3];
+//        index = 0;
+//        Mat img = nominalEdgesMat.clone();
+//        for (int i = 0; i < templateMat.length; ++i) {
+//            int result_cols = img.cols() - templateMat[i].cols() + 1;
+//            int result_rows = img.rows() - templateMat[i].rows() + 1;
+//            Mat tmp = new Mat();
+//            tmp.create(result_rows, result_cols, CvType.CV_32FC1);
+//            resultMat[i] = tmp.clone();
+//            int match_method = TM_SQDIFF_NORMED;
+//
+//            Imgproc.matchTemplate(img, templateMat[i], resultMat[i], match_method);
+//
+//            Core.normalize(resultMat[i], resultMat[i], 0, 1, Core.NORM_MINMAX, -1, new Mat());
+//
+//            Core.MinMaxLocResult mmr = Core.minMaxLoc(resultMat[i]);
+//            matchLoc[i] = mmr.minLoc;
+//            if (matchLoc[i].x > matchLoc[index].x)
+//                index = i;
+//        }
+//        if (matchLoc[index].x == 0) {
+//            index = -1;
+//            return "";
+//        }
+//
+//        Imgproc.rectangle(img, matchLoc[index], new Point(matchLoc[index].x + templateMat[index].cols(), matchLoc[index].y + templateMat[index].rows()),
+//                new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256)));
+//
+//        String imgFile = tempImagesFolderPath + IntermediateFiles.TEMPLATE;
+//        Imgcodecs.imwrite(imgFile, img);
+//
+//        return imgFile;
+//    }
+
     public String TemplateMatching() {
-        Mat[] resultMat = new Mat[3];
-        Point[] matchLoc = new Point[3];
-        index = 0;
+
+        ArrayList<Mat[]> resultsMat = new ArrayList<>(3);
+        resultsMat.add(new Mat[templatesMat.get(0).length]);
+        resultsMat.add(new Mat[templatesMat.get(1).length]);
+        resultsMat.add(new Mat[templatesMat.get(2).length]);
+        ArrayList<Point[]> matchLocs = new ArrayList<>(3);
+        matchLocs.add(new Point[templatesMat.get(0).length]);
+        matchLocs.add(new Point[templatesMat.get(1).length]);
+        matchLocs.add(new Point[templatesMat.get(2).length]);
+
+        index1 = 0;
+        index2 = 0;
         Mat img = nominalEdgesMat.clone();
-        for (int i = 0; i < 2; ++i) {
-            int result_cols = img.cols() - templateMat[i].cols() + 1;
-            int result_rows = img.rows() - templateMat[i].rows() + 1;
-            Mat tmp = new Mat();
-            tmp.create(result_rows, result_cols, CvType.CV_32FC1);
-            resultMat[i] = tmp.clone();
-            int match_method = TM_SQDIFF_NORMED;
 
-            Imgproc.matchTemplate(img, templateMat[i], resultMat[i], match_method);
+        for (int i = 0; i < templatesMat.size(); i++) {
+            for (int j = 0; j < templatesMat.get(i).length; j++) {
+                int result_cols = img.cols() - templatesMat.get(i)[j].cols() + 1;
+                int result_rows = img.rows() - templatesMat.get(i)[j].rows() + 1;
+                Mat tmp = new Mat();
+                tmp.create(result_rows, result_cols, CvType.CV_32FC1);
+                resultsMat.get(i)[j] = tmp.clone();
+                int match_method = TM_SQDIFF_NORMED;
 
-            Core.normalize(resultMat[i], resultMat[i], 0, 1, Core.NORM_MINMAX, -1, new Mat());
+                Imgproc.matchTemplate(img, templatesMat.get(i)[j], resultsMat.get(i)[j], match_method);
 
-            Core.MinMaxLocResult mmr = Core.minMaxLoc(resultMat[i]);
-            matchLoc[i] = mmr.minLoc;
-            if (matchLoc[i].x > matchLoc[index].x)
-                index = i;
+                Core.normalize(resultsMat.get(i)[j], resultsMat.get(i)[j], 0, 1, Core.NORM_MINMAX, -1, new Mat());
+
+                Core.MinMaxLocResult mmr = Core.minMaxLoc(resultsMat.get(i)[j]);
+                matchLocs.get(i)[j] = mmr.minLoc;
+                if (matchLocs.get(i)[j].x > matchLocs.get(index1)[index2].x) {
+                    index1 = i;
+                    index2 = j;
+                }
+            }
         }
-        if (matchLoc[index].x == 0) {
-            index = -1;
+
+        if (matchLocs.get(index1)[index2].x == 0) {
+            index1 = -1;
+            index2 = -1;
             return "";
         }
 
-        Imgproc.rectangle(img, matchLoc[index], new Point(matchLoc[index].x + templateMat[index].cols(), matchLoc[index].y + templateMat[index].rows()),
+        Imgproc.rectangle(img, matchLocs.get(index1)[index2],
+                new Point(matchLocs.get(index1)[index2].x + templatesMat.get(index1)[index2].cols(),
+                        matchLocs.get(index1)[index2].y + templatesMat.get(index1)[index2].rows()),
                 new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256)));
+
 
         String imgFile = tempImagesFolderPath + IntermediateFiles.TEMPLATE;
         Imgcodecs.imwrite(imgFile, img);
-
         return imgFile;
     }
 
     public String Nominal() {
-        if (index == 0)
+        if (index1 == 0)
             return "50 рублей";
-        else if (index == 1)
+        else if (index1 == 1)
             return "100 рублей";
-        else if (index == 2)
+        else if (index1 == 2)
             return "200 рублей";
         else
             return "Не распознано";
@@ -256,6 +332,7 @@ public class ImageRecognition {
         TEMPLATE("/templateImage.jpg");
 
         private String fileName;
+
         IntermediateFiles(String fileName) {
             this.fileName = fileName;
         }
