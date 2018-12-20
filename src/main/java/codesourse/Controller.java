@@ -93,6 +93,7 @@ public class Controller {
 
         //вот я добавил это
         ImageRecognition imageRecognition = new ImageRecognition(sourceFile);
+        String cannyFilename = imageRecognition.CannyEdge();
         String contourFilename = imageRecognition.FindContour();
         String croppedFilename = imageRecognition.CropImage();
         String normalizedFileName = imageRecognition.NormalizeImage();
