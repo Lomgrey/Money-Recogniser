@@ -59,14 +59,13 @@ public class ImageRecognition {
 //
 //        templateMat[2] = Imgcodecs.imread(tempImagesFolderPath + "/Template200.jpg");
 //        Imgproc.cvtColor(templateMat[2], templateMat[2], Imgproc.COLOR_BGR2GRAY);
-        templatesMat.add(new Mat[43]);//200
+        templatesMat.add(new Mat[32]);//50
         templatesMat.add(new Mat[38]);//100
-        templatesMat.add(new Mat[30]);//50
-
+        templatesMat.add(new Mat[43]);//200
 
 
         for (int i = 0; i < templatesMat.get(0).length; i++) {
-            templatesMat.get(0)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates200/Template200_" + (i + 1) + ".jpg");
+            templatesMat.get(0)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates50/Template50_" + (i + 1) + ".jpg");
             Imgproc.cvtColor(templatesMat.get(0)[i], templatesMat.get(0)[i], Imgproc.COLOR_BGR2GRAY);
         }
 
@@ -76,7 +75,7 @@ public class ImageRecognition {
         }
 
         for (int i = 0; i < templatesMat.get(2).length; i++) {
-            templatesMat.get(2)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates50/Template50_" + (i + 1) + ".jpg");
+            templatesMat.get(2)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates200/Template200_" + (i + 1) + ".jpg");
             Imgproc.cvtColor(templatesMat.get(2)[i], templatesMat.get(2)[i], Imgproc.COLOR_BGR2GRAY);
         }
     }
@@ -289,7 +288,7 @@ public class ImageRecognition {
 
                 Core.MinMaxLocResult mmr = Core.minMaxLoc(resultsMat.get(i)[j]);
                 matchLocs.get(i)[j] = mmr.minLoc;
-                if (matchLocs.get(i)[j].x > matchLocs.get(index1)[index2].x) {
+                if (matchLocs.get(i)[j].x > 0/*matchLocs.get(index1)[index2].x*/) {
                     index1 = i;
                     index2 = j;
                 }
@@ -314,11 +313,11 @@ public class ImageRecognition {
     }
 
     public String Nominal() {
-        if (index1 == 2)
+        if (index1 == 0)
             return "50 рублей";
         else if (index1 == 1)
             return "100 рублей";
-        else if (index1 == 0)
+        else if (index1 == 2)
             return "200 рублей";
         else
             return "Не распознано";
