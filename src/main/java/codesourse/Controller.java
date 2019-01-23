@@ -91,18 +91,16 @@ public class Controller {
     public void mouseDragExited() {
         rootGridPane.setStyle("-fx-border-color: #C6C6C6;");
 
-        //вот я добавил это
         ImageRecognition imageRecognition = new ImageRecognition(sourceFile);
-        String cannyFilename = imageRecognition.CannyEdge();
-        String contourFilename = imageRecognition.FindContour();
-        String croppedFilename = imageRecognition.CropImage();
-        String normalizedFileName = imageRecognition.NormalizeImage();
-        String croppedNominalFilename = imageRecognition.CropNominal();
-        String nominalEdgesFilename = imageRecognition.NominalEdges();
-        String templateMatchingFilename = imageRecognition.TemplateMatching();//вернет пустоту, если не распознан
-        String nominal = imageRecognition.Nominal();// тут типа номинал
+        imageRecognition.cannyEdge();
+        imageRecognition.findContour();
+        imageRecognition.cropImage();
+        imageRecognition.normalizeImage();
+        imageRecognition.cropNominal();
+        imageRecognition.nominalEdges();
 
-//        showIntermediateImages();
+        String templateMatchingFilename = imageRecognition.templateMatching();//вернет пустоту, если не распознан
+        String nominal = imageRecognition.nominal();// тут типа номинал
 
         if (templateMatchingFilename.equals("")) {
             System.out.println("Купюра не распознана");

@@ -7,6 +7,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,43 +52,48 @@ public class ImageRecognition {
             resize(sourceMat, sourceMat, size);
         }
 
-//        templateMat[0] = Imgcodecs.imread(tempImagesFolderPath + "/Template50.jpg");
-//        Imgproc.cvtColor(templateMat[0], templateMat[0], Imgproc.COLOR_BGR2GRAY);
-//
-//        templateMat[1] = Imgcodecs.imread(tempImagesFolderPath + "/Template100.jpg");
-//        Imgproc.cvtColor(templateMat[1], templateMat[1], Imgproc.COLOR_BGR2GRAY);
-//
-//        templateMat[2] = Imgcodecs.imread(tempImagesFolderPath + "/Template200.jpg");
-//        Imgproc.cvtColor(templateMat[2], templateMat[2], Imgproc.COLOR_BGR2GRAY);
-        templatesMat.add(new Mat[32]);//50
+        templatesMat.add(new Mat[30]);//50
         templatesMat.add(new Mat[38]);//100
         templatesMat.add(new Mat[43]);//200
 
 
         for (int i = 0; i < templatesMat.get(0).length; i++) {
-            templatesMat.get(0)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates50/Template50_" + (i + 1) + ".jpg");
+            URL url = getClass().getClassLoader().getResource("Templates50/Template50_" + (i + 1) + ".jpg");
+            String path = removeExtraChars(url.getPath());
+
+            templatesMat.get(0)[i] = Imgcodecs.imread(path);
             Imgproc.cvtColor(templatesMat.get(0)[i], templatesMat.get(0)[i], Imgproc.COLOR_BGR2GRAY);
         }
 
         for (int i = 0; i < templatesMat.get(1).length; i++) {
-            templatesMat.get(1)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates100/Template100_" + (i + 1) + ".jpg");
+            URL url = getClass().getClassLoader().getResource("Templates100/Template100_" + (i + 1) + ".jpg");
+            String path = removeExtraChars(url.getPath());
+
+            templatesMat.get(1)[i] = Imgcodecs.imread(path);
             Imgproc.cvtColor(templatesMat.get(1)[i], templatesMat.get(1)[i], Imgproc.COLOR_BGR2GRAY);
         }
 
         for (int i = 0; i < templatesMat.get(2).length; i++) {
-            templatesMat.get(2)[i] = Imgcodecs.imread(tempImagesFolderPath + "/Templates200/Template200_" + (i + 1) + ".jpg");
+            URL url = getClass().getClassLoader().getResource("Templates200/Template200_" + (i + 1) + ".jpg");
+            String path = removeExtraChars(url.getPath());
+
+            templatesMat.get(2)[i] = Imgcodecs.imread(path);
             Imgproc.cvtColor(templatesMat.get(2)[i], templatesMat.get(2)[i], Imgproc.COLOR_BGR2GRAY);
         }
     }
 
-    public String CannyEdge() {
-        cannyMat = CannyEdges(sourceMat);
+    private String removeExtraChars(String text) {
+        return text.replaceAll("%20", " ");
+    }
+
+    public String cannyEdge() {
+        cannyMat = cannyEdges(sourceMat);
         String imgFile = tempImagesFolderPath + IntermediateFiles.CANNY;
         Imgcodecs.imwrite(imgFile, cannyMat);
         return imgFile;
     }
 
-    public String FindContour() {
+    public String findContour() {
         //находим края по серому изображению, схораняем в лист контуров
 
 
@@ -133,7 +139,7 @@ public class ImageRecognition {
         return imgFile;
     }
 
-    public String CropImage() {
+    public String cropImage() {
         //обычный, не крученый прямоугольник
         croppedMat = contourMat.submat(Rect);
 
@@ -143,7 +149,7 @@ public class ImageRecognition {
         return imgFile;
     }
 
-    public String NormalizeImage() {
+    public String normalizeImage() {
         //ебаные углы купюры
         Point LeftUp = new Point();
         double dist1 = Double.MAX_VALUE;
@@ -156,36 +162,36 @@ public class ImageRecognition {
 
         //находим ебаные углы купюры по минимальному расстоянию до точек углов изображения
         for (Point point : contoursPolyList.get(maxValIdx).toList()) {
-            if (GetDistance(point, 0, 0) +
-                    GetDistance(point, 0, 0, 0, Rect.height) +
-                    GetDistance(point, 0, 0, Rect.width, 0) < dist1) {
-                dist1 = GetDistance(point, 0, 0) +
-                        GetDistance(point, 0, 0, 0, Rect.height) +
-                        GetDistance(point, 0, 0, Rect.width, 0);
+            if (getDistance(point, 0, 0) +
+                    getDistance(point, 0, 0, 0, Rect.height) +
+                    getDistance(point, 0, 0, Rect.width, 0) < dist1) {
+                dist1 = getDistance(point, 0, 0) +
+                        getDistance(point, 0, 0, 0, Rect.height) +
+                        getDistance(point, 0, 0, Rect.width, 0);
                 LeftUp = new Point(point.x - Rect.x, point.y - Rect.y);
             }
-            if (GetDistance(point, Rect.width, 0) +
-                    GetDistance(point, Rect.width, 0, 0, 0) +
-                    GetDistance(point, Rect.width, 0, Rect.width, Rect.height) < dist2) {
-                dist2 = GetDistance(point, Rect.width, 0) +
-                        GetDistance(point, Rect.width, 0, 0, 0) +
-                        GetDistance(point, Rect.width, 0, Rect.width, Rect.height);
+            if (getDistance(point, Rect.width, 0) +
+                    getDistance(point, Rect.width, 0, 0, 0) +
+                    getDistance(point, Rect.width, 0, Rect.width, Rect.height) < dist2) {
+                dist2 = getDistance(point, Rect.width, 0) +
+                        getDistance(point, Rect.width, 0, 0, 0) +
+                        getDistance(point, Rect.width, 0, Rect.width, Rect.height);
                 RightUp = new Point(point.x - Rect.x, point.y - Rect.y);
             }
-            if (GetDistance(point, 0, Rect.height) +
-                    GetDistance(point, 0, Rect.height, 0, 0) +
-                    GetDistance(point, 0, Rect.height, Rect.width, Rect.height) < dist3) {
-                dist3 = GetDistance(point, 0, Rect.height) +
-                        GetDistance(point, 0, Rect.height, 0, 0) +
-                        GetDistance(point, 0, Rect.height, Rect.width, Rect.height);
+            if (getDistance(point, 0, Rect.height) +
+                    getDistance(point, 0, Rect.height, 0, 0) +
+                    getDistance(point, 0, Rect.height, Rect.width, Rect.height) < dist3) {
+                dist3 = getDistance(point, 0, Rect.height) +
+                        getDistance(point, 0, Rect.height, 0, 0) +
+                        getDistance(point, 0, Rect.height, Rect.width, Rect.height);
                 LeftDown = new Point(point.x - Rect.x, point.y - Rect.y);
             }
-            if (GetDistance(point, Rect.width, Rect.height) +
-                    GetDistance(point, Rect.width, Rect.height, Rect.width, 0) +
-                    GetDistance(point, Rect.width, Rect.height, 0, Rect.height) < dist4) {
-                dist4 = GetDistance(point, Rect.width, Rect.height) +
-                        GetDistance(point, Rect.width, Rect.height, Rect.width, 0) +
-                        GetDistance(point, Rect.width, Rect.height, 0, Rect.height);
+            if (getDistance(point, Rect.width, Rect.height) +
+                    getDistance(point, Rect.width, Rect.height, Rect.width, 0) +
+                    getDistance(point, Rect.width, Rect.height, 0, Rect.height) < dist4) {
+                dist4 = getDistance(point, Rect.width, Rect.height) +
+                        getDistance(point, Rect.width, Rect.height, Rect.width, 0) +
+                        getDistance(point, Rect.width, Rect.height, 0, Rect.height);
                 RightDown = new Point(point.x - Rect.x, point.y - Rect.y);
             }
         }
@@ -203,7 +209,7 @@ public class ImageRecognition {
         return imgFile;
     }
 
-    public String CropNominal() {
+    public String cropNominal() {
         Rect crop = new Rect(600, 210, 300, 150);
         croppedNominalMat = NormalizedMat.submat(crop);
 
@@ -213,8 +219,8 @@ public class ImageRecognition {
         return imgFile;
     }
 
-    public String NominalEdges() {
-        nominalEdgesMat = CannyEdges(croppedNominalMat);
+    public String nominalEdges() {
+        nominalEdgesMat = cannyEdges(croppedNominalMat);
 
         String imgFile = tempImagesFolderPath + IntermediateFiles.NOMINAL_EDGES;
         Imgcodecs.imwrite(imgFile, nominalEdgesMat);
@@ -222,43 +228,7 @@ public class ImageRecognition {
         return imgFile;
     }
 
-//    public String TemplateMatching() {
-//        Mat[] resultMat = new Mat[3];
-//        Point[] matchLoc = new Point[3];
-//        index = 0;
-//        Mat img = nominalEdgesMat.clone();
-//        for (int i = 0; i < templateMat.length; ++i) {
-//            int result_cols = img.cols() - templateMat[i].cols() + 1;
-//            int result_rows = img.rows() - templateMat[i].rows() + 1;
-//            Mat tmp = new Mat();
-//            tmp.create(result_rows, result_cols, CvType.CV_32FC1);
-//            resultMat[i] = tmp.clone();
-//            int match_method = TM_SQDIFF_NORMED;
-//
-//            Imgproc.matchTemplate(img, templateMat[i], resultMat[i], match_method);
-//
-//            Core.normalize(resultMat[i], resultMat[i], 0, 1, Core.NORM_MINMAX, -1, new Mat());
-//
-//            Core.MinMaxLocResult mmr = Core.minMaxLoc(resultMat[i]);
-//            matchLoc[i] = mmr.minLoc;
-//            if (matchLoc[i].x > matchLoc[index].x)
-//                index = i;
-//        }
-//        if (matchLoc[index].x == 0) {
-//            index = -1;
-//            return "";
-//        }
-//
-//        Imgproc.rectangle(img, matchLoc[index], new Point(matchLoc[index].x + templateMat[index].cols(), matchLoc[index].y + templateMat[index].rows()),
-//                new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256)));
-//
-//        String imgFile = tempImagesFolderPath + IntermediateFiles.TEMPLATE;
-//        Imgcodecs.imwrite(imgFile, img);
-//
-//        return imgFile;
-//    }
-
-    public String TemplateMatching() {
+    public String templateMatching() {
 
         ArrayList<Mat[]> resultsMat = new ArrayList<>(3);
         resultsMat.add(new Mat[templatesMat.get(0).length]);
@@ -312,7 +282,7 @@ public class ImageRecognition {
         return imgFile;
     }
 
-    public String Nominal() {
+    public String nominal() {
         if (index1 == 0)
             return "50 рублей";
         else if (index1 == 1)
@@ -323,7 +293,7 @@ public class ImageRecognition {
             return "Не распознано";
     }
 
-    private Mat CannyEdges(Mat Input) {
+    private Mat cannyEdges(Mat Input) {
         //серое изображение
         Mat srcGray = new Mat();
         Imgproc.cvtColor(Input, srcGray, Imgproc.COLOR_BGR2GRAY);
@@ -334,18 +304,18 @@ public class ImageRecognition {
         return Output;
     }
 
-    private double GetDistance(Point point, int x1, int y1, int x2, int y2) {
+    private double getDistance(Point point, int x1, int y1, int x2, int y2) {
         double top = Math.abs((y2 - y1) * (point.x - Rect.x) - (x2 - x1) * (point.y - Rect.y) + x2 * y1 - y2 * x1);
         double bottom = Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
         return top / bottom;
     }
 
-    private double GetDistance(Point point, int x, int y) {
+    private double getDistance(Point point, int x, int y) {
         double distance = Math.sqrt(Math.pow(point.x - Rect.x - x, 2) + Math.pow(point.y - Rect.y - y, 2));
         return distance;
     }
 
-    public Image MatToImage(Mat mat) {
+    public Image matToImage(Mat mat) {
         MatOfByte byteMat = new MatOfByte();
         Imgcodecs.imencode(".jpg", mat, byteMat);
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
