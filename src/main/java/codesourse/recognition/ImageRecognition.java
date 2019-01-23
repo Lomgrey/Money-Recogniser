@@ -25,7 +25,6 @@ public class ImageRecognition {
     private Mat NormalizedMat;
     private Mat croppedNominalMat;
     private Mat nominalEdgesMat;
-    //   private Mat[] templateMat = new Mat[3];
     private ArrayList<Mat[]> templatesMat = new ArrayList<>(3);
     private int index1, index2;
 
