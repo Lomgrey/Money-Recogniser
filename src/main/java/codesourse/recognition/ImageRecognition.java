@@ -27,7 +27,7 @@ public class ImageRecognition {
     private Mat nominalEdgesMat;
     private ArrayList<Mat[]> templatesMat = new ArrayList<>(3);
     private int index1, index2;
-
+//oj
     private int MAX_THRESHOLD = 35;
     private Random rng = new Random(12345);
 
